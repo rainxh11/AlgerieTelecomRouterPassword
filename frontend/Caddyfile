@@ -1,15 +1,15 @@
 :8000 {
-    root * /usr/share/caddy
-    encode gzip
+    encode zstd gzip 
 
     # Reverse proxy API requests to backend
-    reverse_proxy /api/* http://backend:8000 {
-        header_up X-Real-IP {remote_host}
-        header_up X-Forwarded-For {remote_host}
-        header_up X-Forwarded-Proto {scheme}
+    handle /api/* {
+        reverse_proxy http://backend:8000
     }
 
-    # Serve static files
-    file_server
-    try_files {path} /index.html
+    # Serve static files for everything else
+    handle {
+        root * /usr/share/caddy
+        try_files {path} /index.html
+        file_server
+    }
 }
