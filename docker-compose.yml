@@ -1,0 +1,29 @@
+version: '3.8'
+name: fiberhome-password
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fiberhome-backend
+    expose:
+      - "8000"
+    environment:
+      - PORT=8000
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fiberhome-frontend
+    expose:
+      - "8000"
+    # add port mapping if want to run locally
+    ports:
+      - "3000:8000"
+    depends_on:
+      - backend
+    restart: always
+

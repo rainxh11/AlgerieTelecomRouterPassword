@@ -1,0 +1,14 @@
+# Backend
+backend/admin_pass
+*.exe
+
+# Frontend
+frontend/node_modules
+frontend/dist
+frontend/.env
+
+# General
+.DS_Store
+*.log
+.vscode
+.idea
