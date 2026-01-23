@@ -20,6 +20,9 @@ services:
     container_name: fiberhome-frontend
     expose:
       - "8000"
+    # add port mapping if want to run locally
+    ports:
+      - "3000:8000"
     depends_on:
       - backend
     restart: always
