@@ -24,7 +24,7 @@ docker-compose up --build
 
 3. Open your browser and navigate to `http://localhost`
 
-The backend API will be available at `http://localhost:8080`
+The backend API will be available at `http://localhost:3000`
 
 ### Manual Setup
 
