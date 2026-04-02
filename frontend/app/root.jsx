@@ -10,6 +10,12 @@ import {
   useRouteError,
 } from "react-router";
 
+export function links() {
+  return [
+    { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
+  ];
+}
+
 function Document({ children, title = "Fiberhome Password Generator" }) {
   return (
     <html lang="en">

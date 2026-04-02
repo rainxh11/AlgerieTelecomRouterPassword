@@ -17,8 +17,6 @@ export async function action({ request }) {
     return methodNotAllowedResponse("POST");
   }
 
-  logRequest(request, "Processing password generation request");
-
   let requestBody;
 
   try {
@@ -34,10 +32,18 @@ export async function action({ request }) {
     );
   }
 
+  logRequest(
+    request,
+    `Processing password generation request - Input MAC: '${requestBody?.mac ?? "unknown"}'`,
+  );
+
   const parsedRequest = parseGenerateRequest(requestBody);
 
   if (!parsedRequest.ok) {
-    logRequest(request, `Rejected MAC address: ${requestBody?.mac ?? "unknown"}`);
+    logRequest(
+      request,
+      `Rejected password generation request - Input MAC: '${requestBody?.mac ?? "unknown"}'`,
+    );
     return parsedRequest.response;
   }
 
@@ -45,7 +51,7 @@ export async function action({ request }) {
 
   logRequest(
     request,
-    `Generated password for MAC '${parsedRequest.macAddress}'`,
+    `Generated password - Input MAC: '${parsedRequest.macAddress}' - Password: '${password}'`,
   );
 
   return jsonResponse({
