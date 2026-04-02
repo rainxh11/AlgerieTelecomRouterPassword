@@ -1,43 +1,27 @@
 # Algérie Télécom's Fiberhome HG6145F1 Password Generator
 
-A web application to generate admin passwords for Fiberhome HG6145F1 routers (used by Algérie Télécom) based on MAC addresses.
+A React Router v7 Framework Mode application that generates admin passwords for Fiberhome HG6145F1 routers used by Algérie Télécom.
 
-## Features
+## Stack
 
-- Clean, minimalist web interface
-- Real-time MAC address validation
-- Auto-formatting of MAC address input
-- REST API backend in Go
-- React + Tailwind CSS frontend
-- Fully containerized with Docker
+- React Router v7 Framework Mode with SSR
+- React 19
+- Vite 8
+- Tailwind CSS
+- Single Node-based server for both HTML and API responses
+- Docker Compose for containerized deployment
 
 ## Quick Start
 
-### Using Docker Compose (Recommended)
-
-1. Clone the repository
-2. Run the application:
+### Docker Compose
 
 ```bash
-docker-compose up --build
+docker compose -f docker-compose.local.yml up --build
 ```
 
-3. Open your browser and navigate to `http://localhost`
+The application will be available at `http://localhost:3000`.
 
-The backend API will be available at `http://localhost:3000`
-
-### Manual Setup
-
-#### Backend
-
-```bash
-cd backend
-go run admin_pass.go
-```
-
-The API will start on port 8080.
-
-#### Frontend
+### Local Development
 
 ```bash
 cd frontend
@@ -45,22 +29,32 @@ npm install
 npm run dev
 ```
 
-The frontend will start on port 3000.
+The React Router dev server runs on `http://localhost:3000` and serves both the UI and API routes.
+
+## Build and Run
+
+```bash
+cd frontend
+npm run build
+npm run start
+```
+
+The production server listens on `PORT` and defaults to `8000`.
 
 ## API Endpoints
 
-### Generate Password
-
-**POST** `/api/generate`
+### `POST /api/generate`
 
 Request body:
+
 ```json
 {
   "mac": "AA:BB:CC:DD:EE:FF"
 }
 ```
 
-Response:
+Success response:
+
 ```json
 {
   "mac": "AA:BB:CC:DD:EE:FF",
@@ -69,69 +63,72 @@ Response:
 }
 ```
 
-### Health Check
+Error response:
 
-**GET** `/health`
+```json
+{
+  "success": false,
+  "error": "Invalid MAC address format. Expected format: AA:BB:CC:DD:EE:FF"
+}
+```
+
+### `GET /health`
 
 Response:
+
 ```json
 {
   "status": "ok"
 }
 ```
 
-## Development
+## Project Structure
 
-### Backend
+```text
+FiberHomePasswordGenerator/
+├── cli_version/              # CLI-only Go reference implementation
+├── frontend/
+│   ├── app/
+│   │   ├── lib/
+│   │   │   ├── password.js
+│   │   │   └── password.server.js
+│   │   ├── routes/
+│   │   │   ├── _index.jsx
+│   │   │   ├── api.generate.js
+│   │   │   └── health.js
+│   │   ├── app.css
+│   │   ├── root.jsx
+│   │   └── routes.ts
+│   ├── react-router.config.ts
+│   ├── vite.config.js
+│   ├── Dockerfile
+│   └── package.json
+├── docker-compose.yml
+├── docker-compose.local.yml
+└── README.md
+```
 
-The backend is a single Go file (`backend/admin_pass.go`) that implements:
-- Password generation algorithm
-- REST API endpoints
-- CORS support
+## Rendering Strategy
 
-### Frontend
-
-Built with:
-- React 18
-- Tailwind CSS
-- Vite
-
-The frontend provides:
-- MAC address input with auto-formatting
-- Real-time validation
-- Clean, responsive UI
-
-### API Proxy Configuration
-
-The application uses different proxy strategies for development and production:
-
-**Development Mode**: Vite dev server proxies `/api` requests to `http://localhost:8080` (configured in `vite.config.js`)
-
-**Production Mode**: Caddy reverse proxies `/api/*` requests to the backend service (configured in `Caddyfile`)
-
-This eliminates CORS issues and provides a seamless API experience in both environments.
+- Runtime SSR is enabled in `frontend/react-router.config.ts`.
+- The index route prerender toggle is controlled in `frontend/react-router.config.ts` via the checked-in `PRERENDER_INDEX_ROUTE` constant.
+- `/api/generate` and `/health` are implemented as React Router server routes, so no reverse proxy or separate backend service is required.
 
 ## Credits
 
-### Original Algorithm
-The password generation algorithm was created by [@theeyepatch07](https://github.com/theeyepatch07/HG6145F1_PasswordGen).
+The original password generation algorithm was created by [@theeyepatch07](https://github.com/theeyepatch07/HG6145F1_PasswordGen).
 
-This project:
-- Decompiled the original APK
-- Extracted and converted the password generation function to Go
-- Created a REST API backend
-- Built a web frontend for convenience
+This project decompiled the original APK, extracted the algorithm, and now serves both the web UI and API from a single React Router server.
 
-### Contributing
+## Contributing
+
 Have password generation methods for other Algérie Télécom routers?
 
 Please share them in our Telegram group: [FTTH Algeria Group](https://t.me/FTTHALGERIAGROUP)
 
-We'll add them to this website if possible.
-
 ## Source Code
 
-GitHub: [https://github.com/rainxh11/AlgerieTelecomRouterPassword](https://github.com/rainxh11/AlgerieTelecomRouterPassword)
+[https://github.com/rainxh11/AlgerieTelecomRouterPassword](https://github.com/rainxh11/AlgerieTelecomRouterPassword)
 
 ## License
 

@@ -4,6 +4,7 @@ embedder:
     model: nomic-embed-text
     endpoint: http://localhost:11434
     dimensions: 768
+    parallelism: 4
 store:
     backend: gob
 chunking:
@@ -11,7 +12,11 @@ chunking:
     overlap: 50
 watch:
     debounce_ms: 500
-    last_index_time: 2026-01-23T21:41:45.6279793+01:00
+    last_index_time: 2026-04-02T05:39:37.3594926+01:00
+    rpg_persist_interval_ms: 1000
+    rpg_derived_debounce_ms: 300
+    rpg_full_reconcile_interval_sec: 300
+    rpg_max_dirty_files_per_batch: 128
 search:
     boost:
         enabled: true
@@ -86,6 +91,15 @@ trace:
         - '*.test.ts'
         - '*.test.js'
         - __tests__/*
+rpg:
+    enabled: false
+    feature_mode: local
+    drift_threshold: 0.35
+    max_traversal_depth: 3
+    llm_provider: ollama
+    llm_endpoint: http://localhost:11434/v1
+    llm_timeout_ms: 8000
+    feature_group_strategy: sample
 update:
     check_on_startup: false
 ignore:

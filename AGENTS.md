@@ -1,10 +1,10 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
 ## Project Overview
 
-FiberHomePasswordGenerator is a React Router v7 Framework Mode application for generating admin passwords for Fiberhome HG6145F1 routers used by Algérie Télécom. The app runs as a single Node server that handles SSR and JSON API responses.
+FiberHomePasswordGenerator is a React Router v7 Framework Mode application for generating admin passwords for Fiberhome HG6145F1 routers used by Algérie Télécom. The app now runs as a single Node server that handles both SSR page rendering and JSON API responses.
 
 ### Credits
 
@@ -21,45 +21,47 @@ FiberHomePasswordGenerator is a React Router v7 Framework Mode application for g
 
 ## Architecture
 
-### React Router Application
+### React Router Server
 
-The deployed web application is fully contained in `frontend/`:
+The web application lives entirely under `frontend/` and uses React Router framework conventions:
 
-- `frontend/react-router.config.ts`: SSR and prerender config
-- `frontend/app/root.jsx`: document shell
-- `frontend/app/routes.ts`: route map
+- `frontend/react-router.config.ts`: enables SSR and controls prerendering for `/`
+- `frontend/app/root.jsx`: root HTML document and shared app shell
+- `frontend/app/routes.ts`: route manifest
 - `frontend/app/routes/_index.jsx`: homepage UI
-- `frontend/app/routes/api.generate.js`: password generation endpoint
-- `frontend/app/routes/health.js`: health endpoint
-- `frontend/app/lib/password.server.js`: server-only password generation and logging helpers
+- `frontend/app/routes/api.generate.js`: `POST /api/generate`
+- `frontend/app/routes/health.js`: `GET /health`
+- `frontend/app/lib/password.server.js`: server-side password generation, request parsing, IP extraction, and logging
 
-### Password Generation
+### Password Algorithm
 
-The algorithm is unchanged from the previous implementation:
+The password generation flow is unchanged:
 
-1. Uppercase the MAC address
+1. Normalize the MAC address to uppercase
 2. Hash `MAC + "AEJLY"` with MD5
-3. Build a 16-character password from four character groups
-4. Replace four positions to guarantee all character classes appear
-5. Resolve collisions between replacement positions
+3. Use the first 20 hex digits to build a 16-character password
+4. Force inclusion of uppercase, lowercase, digit, and special characters by replacing four positions
+5. Resolve collisions so the forced positions stay unique
 
-Character groups:
+Character sets:
 
 - Uppercase: `ACDFGHJMNPRSTUWXY`
 - Lowercase: `abcdfghjkmpstuwxy`
 - Digits: `2345679`
 - Specials: `!@$&%`
 
-### Public API
+### API Surface
 
 - `POST /api/generate`
 - `GET /health`
 
-These are served by React Router route modules directly. There is no Go backend, Caddy, or proxy configuration anymore.
+These endpoints are served directly by the React Router app server, so there is no proxy layer or separate backend service.
 
 ## Development Commands
 
 ### Docker
+
+Start the containerized app locally:
 
 ```bash
 docker compose -f docker-compose.local.yml up --build
@@ -67,13 +69,20 @@ docker compose -f docker-compose.local.yml up --build
 
 ### Frontend
 
+Install dependencies:
+
 ```bash
 cd frontend
 npm install
+```
+
+Run the SSR dev server:
+
+```bash
 npm run dev
 ```
 
-Production build and runtime:
+Build and run production output:
 
 ```bash
 npm run build
@@ -84,9 +93,14 @@ npm run start
 
 ```text
 FiberHomePasswordGenerator/
-├── cli_version/
+├── cli_version/               # CLI-only Go reference implementation
 ├── frontend/
 │   ├── app/
+│   │   ├── lib/
+│   │   ├── routes/
+│   │   ├── app.css
+│   │   ├── root.jsx
+│   │   └── routes.ts
 │   ├── react-router.config.ts
 │   ├── vite.config.js
 │   ├── tailwind.config.js
@@ -95,16 +109,16 @@ FiberHomePasswordGenerator/
 ├── docker-compose.yml
 ├── docker-compose.local.yml
 ├── README.md
-└── CLAUDE.md
+└── AGENTS.md
 ```
 
 ## Implementation Notes
 
-- Runtime SSR is enabled.
-- The `/` route prerender toggle lives in `frontend/react-router.config.ts` via `PRERENDER_INDEX_ROUTE`.
-- The homepage still calls `fetch("/api/generate")`, so the UX remains close to the previous SPA.
-- Request logging preserves method, path, and forwarded client IP when available.
-- `cli_version/` remains a reference implementation and is not part of the deployed web app.
+- Runtime SSR is enabled by default.
+- The checked-in `PRERENDER_INDEX_ROUTE` constant in `frontend/react-router.config.ts` toggles whether `/` is pre-rendered at build time.
+- The homepage still does client-side `fetch("/api/generate")` so the UX remains the same.
+- Request logging preserves method, path, client IP, and high-level outcome details.
+- `cli_version/` remains as a Go reference and is not part of the deployed web stack.
 
 
 ## grepai - Semantic Code Search

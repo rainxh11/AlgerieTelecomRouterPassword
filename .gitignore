@@ -1,10 +1,10 @@
-# Backend
-backend/admin_pass
+# Generated binaries
 *.exe
 
 # Frontend
 frontend/node_modules
-frontend/dist
+frontend/build
+frontend/.react-router
 frontend/.env
 
 # General

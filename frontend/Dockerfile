@@ -1,20 +1,28 @@
 # Build stage
-FROM oven/bun:1-alpine AS builder
+FROM node:20.19-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json bun.lockb* ./
-RUN bun install --frozen-lockfile
+COPY package.json package-lock.json ./
+RUN npm ci
 
 COPY . .
-RUN bun run build
+RUN npm run build
 
 # Production stage
-FROM caddy:2-alpine
+FROM node:20.19-alpine AS runner
 
-COPY --from=builder /app/dist /usr/share/caddy
-COPY Caddyfile /etc/caddy/Caddyfile
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=8000
+
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /app/build ./build
 
 EXPOSE 8000
 
-CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
+CMD ["npm", "run", "start"]
